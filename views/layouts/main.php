@@ -39,8 +39,11 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => 'Объявления', 'url' => ['/advert/advert']],
+            ['label' => 'Бренды', 'url' => ['/advert/brand']],
+            ['label' => 'Модель', 'url' => ['/advert/model']],
+            ['label' => 'Опции', 'url' => ['/advert/option']],
+
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (

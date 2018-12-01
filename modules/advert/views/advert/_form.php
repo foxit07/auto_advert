@@ -15,18 +15,24 @@ AdvAsset::register($this);
 
 /* @var $form yii\widgets\ActiveForm */
 ?>
+<?php
+
+if($advert->hasErrors()){
+    echo '<pre>';
+    print_r($advert->getErrors());
+    echo '</pre>';
+}
+?>
 
 <div class="advert-form">
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <?= $form->field($brand, 'id')->dropDownList($brands)->label('Brands') ?>
+    <?= $form->field($advert, 'brand')->dropDownList($brands)->label('Brands') ?>
 
-    <?= $form->field($advert, 'model_id')->dropDownList($models )->label('Model') ?>
+    <?= $form->field($advert, 'model_id')->dropDownList($models)->label('Model') ?>
 
-    <?= $form->field($options, 'name')
-        ->checkboxList(ArrayHelper::map($options->find()->all(),'id','name'));
-    ?>
+    <?= $form->field($advert, 'option')->checkboxList($options); ?>
 
     <?= $form->field($advert, 'mileage')->textInput() ?>
 
@@ -34,7 +40,7 @@ AdvAsset::register($this);
 
     <?= $form->field($advert, 'phone')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($image, 'image[]')->fileInput(['multiple' => true, 'accept' => 'image/*']) ?>
+    <?= $form->field($advert, 'images[]')->fileInput(['multiple' => true, 'accept' => 'image/*']) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

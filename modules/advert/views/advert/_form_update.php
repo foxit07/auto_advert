@@ -34,11 +34,11 @@ die;*/
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <?= $form->field($brand, 'id')->dropDownList($brands, ['options' =>[ $brand->name => ['Selected' => true]]])->label('Brands') ?>
+    <?= $form->field($advert, 'brand')->dropDownList($brand)->label('Brands') ?>
 
     <?= $form->field($advert, 'model_id')->dropDownList([$model->id => $model->name])->label('Model') ?>
 
-    <?= $form->field($options, 'name')->checkboxList(ArrayHelper::map($options->find()->all(),'id','name'))->label(''); ?>
+    <?= $form->field($advert, 'option')->checkboxList($option); ?>
 
     <?= $form->field($advert, 'mileage')->textInput() ?>
 
@@ -46,7 +46,7 @@ die;*/
 
     <?= $form->field($advert, 'phone')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($image, 'image[]')->fileInput(['multiple' => true, 'accept' => 'image/*']) ?>
+    <?= $form->field($advert, 'images[]')->fileInput(['multiple' => true, 'accept' => 'image/*']) ?>
 
    <?php if(!empty($advert->images)){
             foreach ($advert->images as $image) {

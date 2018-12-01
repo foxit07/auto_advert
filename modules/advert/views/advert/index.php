@@ -21,23 +21,28 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Advert', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php foreach ($data as $advert): ?>
+    <?php foreach ($models as $advert): ?>
 
     <div class="panel panel-default" >
 
         <div class="panel-body" >
             <div style="display: inline-block">
-                <?= Html::img('/uploads/' .$advert['image'], $options = ['class' => 'img-thumbnail', 'style' => ['width' => '146px', 'height' => '106']]); ?>
+                <?php if(!empty($advert->getImages()[0])): ?>
+                <?= Html::img('/uploads/' .$advert->getImages()[0]->path, $options = ['class' => 'img-thumbnail', 'style' => ['width' => '146px', 'height' => '106']]); ?>
+               <?php else: ?>
+               <?php echo 'Нет картинки' ?>
+               <?php endif; ?>
                <h3 style="display: inline-block";>
-                <?= Html::a($advert['brand'] . '  '. $advert['model'], ['advert/view', 'id' => $advert['id']], ['class' => 'profile-link']) ?>
+                <?= Html::a($advert->getModel()->brand->name . '  '. $advert->getModel()->name, ['advert/view', 'id' => $advert->id, ['class' => 'profile-link']]) ?>
                </h3>
             <h4 style="display: inline-block">
-                <?= Yii::$app->formatter->asCurrency($advert['price']) ?>
+                <?= Yii::$app->formatter->asCurrency($advert->price) ?>
             </h4>
-
-            <?= Html::beginForm(['advert/delete', 'id' => $advert['id']], 'post', ['style' => 'display: inline-block']) ?>
-            <?= Html::submitButton('Delete', ['class' => 'btn btn-warning']) ?>
+        <div style="display: inline-block">
+            <?= Html::beginForm(['advert/delete', 'id' => $advert->id, 'post', ['style' => 'display: inline-block']]) ?>
+            <?= Html::submitButton('Delete', ['class' => 'btn btn-warning', 'style' => 'display: inline-block']) ?>
             <?= Html::endForm() ?>
+        </div>
         </div>
         </div>
     </div>

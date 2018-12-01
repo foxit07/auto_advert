@@ -43,14 +43,14 @@ class AdvertController extends Controller
     public function actionIndex()
     {
 
-        $adverts = Advert::find()->all();
-        $data = $this->prepareDataAll($adverts);
-        $pages = new Pagination(['totalCount' => count($data) , 'pageSize'=>5]);
-        $data = array_slice($data, $pages->offset, $pages->limit);
+        $query = Advert::find()->where(['status' => 1]);
+        $countQuery = clone $query;
+        $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => 5]);
+        $models = $query->offset($pages->offset)->limit($pages->limit)->all();
 
         return $this->render('index', [
-            'data' => $data,
-            'pages' => $pages
+            'models' => $models,
+            'pages' => $pages,
         ]);
     }
 
@@ -63,10 +63,8 @@ class AdvertController extends Controller
     public function actionView($id)
     {
         $advert = Advert::find()->where(['id' => $id])->one();
-        $data = $this->prepareDataOne($advert);
-
         return $this->render('view', [
-            'advert' => $data,
+            'advert' => $advert,
         ]);
     }
 
@@ -78,28 +76,19 @@ class AdvertController extends Controller
     public function actionCreate()
     {
         $advert = new Advert();
-        $brand = new Brand();
-        $options = new Option();
-        $model = new Model();
-        $image = new Image();
-
-        $brands = ArrayHelper::map($brand->find()->all(), 'id', 'name');
+        $brands = ArrayHelper::map(Brand::find()->all(), 'id', 'name');
         $models = ArrayHelper::map(Model::find()->where(['brand_id' => key($brands)])->all(),'id','name');
+        $options =  ArrayHelper::map(Option::find()->all(), 'id', 'name');
 
-        if ($advert->load(Yii::$app->request->post())){
-                $data = Yii::$app->request->post();
-                if($advert->saveAll($data)) {
-                    return $this->redirect(['view', 'id' => $advert->id]);
-                }
-            }
+        if ($advert->load(Yii::$app->request->post()) && $advert->saveA()) {
+            return $this->redirect(['view', 'id' => $advert->id]);
+        }
 
         return $this->render('create', [
             'advert' => $advert,
-            'brand' => $brand,
             'brands' => $brands,
             'options' => $options,
             'models' => $models,
-            'image' => $image,
         ]);
     }
 
@@ -112,28 +101,25 @@ class AdvertController extends Controller
      */
     public function actionUpdate($id)
     {
-        $options = new Option();
-        $image = new Image();
-        $advert = $this->findModel($id);
-        $brands = ArrayHelper::map(Brand::find()->all(),'id','name');
+
+        $advert = Advert::find()->where(['id' => $id])->one();
         $model = Model::find()->where(['id' => $advert->model_id])->one();
-        $brand = $model->brand;
-        $options->name = ArrayHelper::getColumn($advert->options,'id');
+        $brand = ArrayHelper::map(Brand::find()->all(), 'id', 'name');
+        $option =  ArrayHelper::map(Option::find()->all(), 'id', 'name');
+        $advert->option =$advert->options;
+        $advert->brand = $model->brand->id;
+        $advert->images = $advert->getImages();
 
-        if ($advert->load(Yii::$app->request->post()) ) {
-            $data = Yii::$app->request->post();
-            $advert->saveAll($data, 'update');
 
+        if ($advert->load(Yii::$app->request->post()) && $advert->updateA()) {
             return $this->redirect(['view', 'id' => $advert->id]);
         }
 
         return $this->render('update', [
             'advert' => $advert,
-            'options' => $options,
+            'option' => $option,
             'brand' => $brand,
-            'brands' => $brands,
             'model' => $model,
-            'image' => $image,
         ]);
     }
 
@@ -146,14 +132,8 @@ class AdvertController extends Controller
      */
     public function actionDelete($id)
     {
-        $image = new Image();
-        $advert = new Advert();
-
-        $advert->destroyOptions($this->findModel($id));
-        $image->deleteImage($this->findModel($id));
-
-        $this->findModel($id)->delete();
-
+        $advert =  Advert::find(['id' => $id])->one();
+        $advert->deleteA();
         return $this->redirect(['index']);
     }
 
@@ -194,6 +174,7 @@ class AdvertController extends Controller
         foreach ($adverts as $advert)
         {
             $model = Model::find()->where(['id' => $advert->model_id])->one();
+
             $brand = $model->brand;
             $data[] =[
                 'id' => $advert->id,

@@ -4,7 +4,7 @@ namespace app\modules\advert\models;
 
 use Yii;
 use yii\web\UploadedFile;
-use app\modules\advert\components\Storage;
+use app\modules\advert\components\StorageBehavior;
 use app\modules\advert\models\Advert;
 
 /**
@@ -47,7 +47,7 @@ class Image extends \yii\db\ActiveRecord
 
     public function uploadImages()
     {
-        $storage = new Storage();
+        $storage = new StorageBehavior();
         $this->setImages();
 
         if($this->image){
@@ -79,7 +79,7 @@ class Image extends \yii\db\ActiveRecord
     public function deleteImage($obj)
     {
         $images = self::find()->where(['advert_id' => $obj->id])->all();
-        $storage = new Storage();
+        $storage = new StorageBehavior();
 
         if($images){
             foreach ($images as $image){

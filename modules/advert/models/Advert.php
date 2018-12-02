@@ -61,6 +61,13 @@ class Advert extends \yii\db\ActiveRecord
        return Image::find()->where(['advert_id' => $this->id])->all();
     }
 
+    public function getImagesDAO()
+    {
+        return Yii::$app->db->createCommand('SELECT [[id]], [[path]] FROM {{images}} WHERE advert_id = :id')
+            ->bindValue(':id', $this->id)
+            ->queryAll();
+    }
+
     public function getModel()
     {
         return Model::find()->where(['id' => $this->model_id])->one();
@@ -73,6 +80,14 @@ class Advert extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Option::className(),['id' => 'option_id'])->viaTable('adverts_options', ['advert_id' => 'id']);
     }
+
+    public function getOptionsDAO()
+    {
+        return Yii::$app->db->createCommand('SELECT * FROM {{adverts_options}} WHERE advert_id = :id')
+            ->bindValue(':id', $this->id)
+            ->queryAll();
+    }
+
 
     /**
      * @param null $object
